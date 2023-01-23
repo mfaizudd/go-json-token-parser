@@ -3,6 +3,26 @@
 this repository is for me to test out parsing token
 in json using go
 
+## Usage
+```go
+import (
+    "fmt"
+
+    gjtp "github.com/mfaizudd/go-json-token-parser"
+)
+
+
+func main() {
+    data := []byte(`{"token": "pm9k6CEW0mc="}`)
+    input := []byte(`{"Authorization": "Bearer ${token}"}`)
+    result, err := gjtp.Parse(input, data)
+    if err != nil {
+        panic(err)
+    }
+    fmt.Println(result) // {"Authorization": "Bearer pm9k6CEW0mc="}
+}
+```
+
 Example `data`
 ```json
 {
