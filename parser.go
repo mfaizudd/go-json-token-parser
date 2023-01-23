@@ -22,7 +22,7 @@ func Parse(input []byte, data []byte) (string, error) {
 		token := match[0]
 		val, typ, _, err := jsonparser.Get(data, keys...)
 		if err != nil {
-            return "", err
+			return "", err
 		}
 		switch typ {
 		case jsonparser.Object:
@@ -40,5 +40,5 @@ func Parse(input []byte, data []byte) (string, error) {
 		}
 		result = strings.Replace(result, token, string(val), -1)
 	}
-    return result, nil
+	return result, nil
 }

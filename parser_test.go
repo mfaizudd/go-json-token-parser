@@ -43,12 +43,15 @@ func TestParse(t *testing.T) {
 		panic(err)
 	}
 	result, err := Parse(bodyJson, responseJson)
+	if err != nil {
+		panic(err)
+	}
 	var indentedResult bytes.Buffer
 	err = json.Indent(&indentedResult, []byte(result), "", "    ")
 	if err != nil {
 		panic(err)
 	}
-    expected := `{
+	expected := `{
     "Authorization": "Bearer some string",
     "age": 123,
     "all": {
@@ -84,7 +87,7 @@ func TestParse(t *testing.T) {
     },
     "object_with_message": "Message: {\"key3\":\"value3\"}"
 }`
-    if expected != string(indentedResult.Bytes()) {
-        t.Errorf("Expected %s, got %s", expected, string(indentedResult.Bytes()))
-    }
+	if expected != string(indentedResult.Bytes()) {
+		t.Errorf("Expected %s, got %s", expected, string(indentedResult.Bytes()))
+	}
 }
