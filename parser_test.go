@@ -1,16 +1,12 @@
-package main
+package gojsontokenparser
 
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
-	"regexp"
-	"strings"
-
-	"github.com/buger/jsonparser"
+	"testing"
 )
 
-func main() {
+func TestParse(t *testing.T) {
 	response := map[string]interface{}{
 		"string": "some string",
 		"number": 123,
@@ -46,41 +42,49 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	r := regexp.MustCompile(`\$\{(.*?)\}`)
-	matches := r.FindAllStringSubmatch(string(bodyJson), -1)
-	result := string(bodyJson)
-	for _, match := range matches {
-		var keys []string
-		if match[1] == "." {
-			keys = []string{}
-		} else {
-			keys = strings.Split(match[1], ".")
-		}
-		token := match[0]
-		val, typ, _, err := jsonparser.Get(responseJson, keys...)
-		if err != nil {
-			panic(err)
-		}
-		switch typ {
-		case jsonparser.Object:
-			fallthrough
-		case jsonparser.Array:
-			fallthrough
-		case jsonparser.Number:
-			newToken := fmt.Sprintf("\"%s\"", token)
-			if strings.Contains(result, newToken) {
-				token = newToken
-			} else {
-				val = []byte(strings.Replace(string(val), "\"", "\\\"", -1))
-			}
-		default:
-		}
-		result = strings.Replace(result, token, string(val), -1)
-	}
+	result, err := Parse(bodyJson, responseJson)
 	var indentedResult bytes.Buffer
 	err = json.Indent(&indentedResult, []byte(result), "", "    ")
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(string(indentedResult.Bytes()))
+    expected := `{
+    "Authorization": "Bearer some string",
+    "age": 123,
+    "all": {
+        "array": [
+            "value1",
+            "value2"
+        ],
+        "number": 123,
+        "object": {
+            "key": "value",
+            "key2": {
+                "key3": "value3"
+            }
+        },
+        "string": "some string"
+    },
+    "array": [
+        "value1",
+        "value2"
+    ],
+    "arrayElement": "value1",
+    "name": "some string",
+    "nested": "Bearer value",
+    "nested2": "Bearer value3",
+    "nested_object": {
+        "key3": "value3"
+    },
+    "object": {
+        "key": "value",
+        "key2": {
+            "key3": "value3"
+        }
+    },
+    "object_with_message": "Message: {\"key3\":\"value3\"}"
+}`
+    if expected != string(indentedResult.Bytes()) {
+        t.Errorf("Expected %s, got %s", expected, string(indentedResult.Bytes()))
+    }
 }
