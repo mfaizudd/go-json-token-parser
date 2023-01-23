@@ -30,17 +30,17 @@ func main() {
 		panic(err)
 	}
 	body := map[string]interface{}{
-		"name":          "${string}",
-		"age":           "${number}",
-		"object":        "${object}",
-		"array":         "${array}",
-		"arrayElement":  "${array.[0]}",
-		"Authorization": "Bearer ${string}",
-		"nested":        "Bearer ${object.key}",
-		"nested2":       "Bearer ${object.key2.key3}",
-		"all":           "${.}",
-        "nested_object": "${object.key2}",
-        "object_with_message": "Message: ${object.key2}",
+		"name":                "${string}",
+		"age":                 "${number}",
+		"object":              "${object}",
+		"array":               "${array}",
+		"arrayElement":        "${array.[0]}",
+		"Authorization":       "Bearer ${string}",
+		"nested":              "Bearer ${object.key}",
+		"nested2":             "Bearer ${object.key2.key3}",
+		"all":                 "${.}",
+		"nested_object":       "${object.key2}",
+		"object_with_message": "Message: ${object.key2}",
 	}
 	bodyJson, err := json.Marshal(body)
 	if err != nil {
@@ -71,8 +71,8 @@ func main() {
 			if strings.Contains(result, newToken) {
 				token = newToken
 			} else {
-                val = []byte(strings.Replace(string(val), "\"", "\\\"", -1))
-            }
+				val = []byte(strings.Replace(string(val), "\"", "\\\"", -1))
+			}
 		default:
 		}
 		result = strings.Replace(result, token, string(val), -1)
