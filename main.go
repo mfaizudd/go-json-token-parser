@@ -59,7 +59,7 @@ func main() {
 			fallthrough
 		case jsonparser.Number:
 			newToken := fmt.Sprintf("\"%s\"", token)
-			if strings.Contains(string(bodyJson), newToken) {
+			if strings.Contains(result, newToken) {
 				token = newToken
 			}
 		default:
