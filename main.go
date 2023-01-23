@@ -34,9 +34,13 @@ func main() {
 		"age":           "${number}",
 		"object":        "${object}",
 		"array":         "${array}",
+		"arrayElement":  "${array.[0]}",
 		"Authorization": "Bearer ${string}",
 		"nested":        "Bearer ${object.key}",
 		"nested2":       "Bearer ${object.key2.key3}",
+		"all":           "${.}",
+        "nested_object": "${object.key2}",
+        "object_with_message": "Message: ${object.key2}",
 	}
 	bodyJson, err := json.Marshal(body)
 	if err != nil {
@@ -46,7 +50,12 @@ func main() {
 	matches := r.FindAllStringSubmatch(string(bodyJson), -1)
 	result := string(bodyJson)
 	for _, match := range matches {
-		keys := strings.Split(match[1], ".")
+		var keys []string
+		if match[1] == "." {
+			keys = []string{}
+		} else {
+			keys = strings.Split(match[1], ".")
+		}
 		token := match[0]
 		val, typ, _, err := jsonparser.Get(responseJson, keys...)
 		if err != nil {
@@ -61,13 +70,15 @@ func main() {
 			newToken := fmt.Sprintf("\"%s\"", token)
 			if strings.Contains(result, newToken) {
 				token = newToken
-			}
+			} else {
+                val = []byte(strings.Replace(string(val), "\"", "\\\"", -1))
+            }
 		default:
 		}
 		result = strings.Replace(result, token, string(val), -1)
 	}
 	var indentedResult bytes.Buffer
-	err = json.Indent(&indentedResult, []byte(result), "", "  ")
+	err = json.Indent(&indentedResult, []byte(result), "", "    ")
 	if err != nil {
 		panic(err)
 	}
